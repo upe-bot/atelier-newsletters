@@ -5,23 +5,38 @@ On empile des blocs, on les met dans l'ordre voulu, on copie le HTML obtenu dans
 
 **Ouvrir l'atelier :** https://upe-bot.github.io/atelier-newsletters/
 
-Cette adresse ne répondra qu'une fois le dépôt rendu public et GitHub Pages activé
-(Settings → Pages → *Deploy from a branch* → `main` / `/ (root)`).
+L'accès est protégé par un mot de passe, communiqué par la Direction de la
+Mobilisation et des Partenariats. Le contenu de la page est chiffré : sans le
+mot de passe, il n'est pas lisible, même en affichant le code source.
 
 ## Ce que ça fait
 
-- Trois familles de lettres — **Veille**, **Interne**, **Externe** — chacune avec son bandeau, ses couleurs et son motif, toutes dans la charte graphique 2025 et la charte design « La porte et l'abri ».
-- Seize blocs : en-tête, édito, sommaire, intitulé de rubrique, article, vidéo, indicateurs, chiffre clé, citation, bonus culturel, ressource, rendez-vous, formation, sondage, participation, pied de page.
+- Quatre familles de lettres — **Veille**, **Interne**, **Externe**, **Établissement** —
+  chacune avec son bandeau, ses couleurs et son motif, toutes dans la charte graphique
+  et la charte design « La porte et l'abri ». On les distingue au premier coup d'œil.
+- Dix-neuf blocs : en-tête, édito, sommaire, intitulé de rubrique, article, vidéo,
+  album photo, indicateurs, chiffre clé, citation, bonus culturel, ressource,
+  rendez-vous, formation, informations pratiques, offre d'emploi, sondage,
+  participation, pied de page.
 - Ajout, déplacement par glissé, duplication, suppression. Aucune limite de nombre de blocs.
 - Aperçu ordinateur et téléphone en temps réel.
-- Sortie : un fichier HTML autonome, compatible Gmail, Outlook, Apple Mail et iOS, avec le lien de désabonnement et les balises de personnalisation Mailchimp.
+- Sortie : un fichier HTML autonome, compatible Gmail, Outlook, Apple Mail et iOS,
+  avec le lien de désabonnement et les balises de personnalisation Mailchimp.
 
 ## Comment s'en servir
 
-Le mode d'emploi complet est dans [`tuto/`](tuto/) — cinq pages, à imprimer ou à transmettre.
+Le mode d'emploi complet est un document interne, diffusé par la Direction de la
+Mobilisation et des Partenariats. Il n'est pas publié ici.
 
 En résumé : choisir la famille, ajouter les blocs, remplir, relire l'aperçu téléphone,
 copier le HTML, puis dans Mailchimp créer une campagne en **Codage personnalisé** et coller.
+
+### La famille Établissement
+
+Pensée pour qu'un établissement prépare lui-même un envoi, prêt à partir :
+le nom de l'établissement et la commune s'affichent dans un bandeau jaune sous
+le titre, et le numéro démarre avec son propre jeu de blocs — édito signé,
+article, album photo, rendez-vous, informations pratiques.
 
 ### Les images
 
@@ -64,6 +79,7 @@ personnes ouvrant la même page voient le même numéro.
 | Jaune sable — signal | `#F7BE47` |
 | Orange vif — accent ponctuel | `#F5A600` |
 | Vert clair — texte secondaire sur sombre | `#A2D2D2` |
+| Vert d'eau — fond de la famille Établissement | `#E4F0F0` |
 | Encre — texte courant | `#12302F` |
 | Gris-vert — légendes | `#5E7473` |
 
@@ -76,9 +92,15 @@ Rien ne descend sous 12 px.
 
 ## Modifier l'atelier
 
-Tout tient dans [`index.html`](index.html), sans dépendance ni étape de construction.
+`index.html` est la page de garde : elle contient l'atelier **chiffré** (AES-256-GCM,
+clé dérivée du mot de passe par PBKDF2-SHA256, 310 000 itérations) et rien d'autre.
+Le code source en clair n'est pas dans ce dépôt — il est conservé par la Direction de
+la Mobilisation et des Partenariats, avec le script `chiffrer.mjs` qui reconstruit
+`index.html` et permet de changer le mot de passe.
 
-- Les couleurs sont dans l'objet `P`, les trois familles dans `FAMILLES`.
+Dans ce code source :
+
+- Les couleurs sont dans l'objet `P`, les quatre familles dans `FAMILLES`.
 - Chaque bloc est une entrée de l'objet `B` : `nom`, `champs` (ce que l'utilisateur
   remplit), `resume` (ce qui s'affiche sur la carte repliée) et `rendu` (le HTML
   de l'e-mail). Pour ajouter un bloc, ajouter une entrée dans `B` et sa valeur de
