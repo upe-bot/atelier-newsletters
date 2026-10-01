@@ -38,6 +38,12 @@ le nom de l'établissement et la commune s'affichent dans un bandeau jaune sous
 le titre, et le numéro démarre avec son propre jeu de blocs — édito signé,
 article, album photo, rendez-vous, informations pratiques.
 
+Le bloc **En-tête** propose la liste des logos d'établissement, repris de
+ceux publiés sur unionpourlenfance.com. Le logo choisi s'affiche sur un bandeau
+blanc tout en haut de la lettre — ces logos sont en vert UPE et ne se lisent que
+sur fond clair — et remplace alors le logo de l'Union dans l'en-tête vert, qu'il
+porte déjà. Un champ permet aussi de coller l'adresse d'un autre logo.
+
 ### Les images
 
 L'atelier ne stocke pas les images : il demande leur adresse. Pour en obtenir une,
