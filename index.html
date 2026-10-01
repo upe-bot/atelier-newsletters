@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Atelier Newsletters UPE</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Neucha&display=swap">
+<style>
+/* Atelier : colonne d'édition à gauche, aperçu e-mail collant à droite ; une colonne sous 900px */
+:root{
+  --bg:#F3F1EC; --surface:#FFFFFF; --surface-2:#EBEFF0; --line:#D9E0E0;
+  --ink:#12302F; --muted:#5E7473; --vert:#0A6F71; --profond:#073A3B;
+  --sable:#F7BE47; --orange:#F5A600; --clair:#A2D2D2;
+  --ui:'Poppins','Century Gothic',Helvetica,Arial,sans-serif;
+  --script:'Neucha',Georgia,cursive;
+  --r:10px; --shadow:0 1px 2px rgba(7,58,59,.06),0 8px 24px rgba(7,58,59,.06);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0C1A1A; --surface:#122A29; --surface-2:#183433; --line:#24433F;
+  --ink:#E6EFEE; --muted:#9FB6B4; --vert:#4FA9A8; --clair:#A2D2D2;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0C1A1A; --surface:#122A29; --surface-2:#183433; --line:#24433F;
+  --ink:#E6EFEE; --muted:#9FB6B4; --vert:#4FA9A8; --clair:#A2D2D2;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.55}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0;text-wrap:balance}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--profond);color:#fff;
+  padding-block:12px;padding-inline:20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.bar .arc{width:11px;height:15px;background:var(--orange);border-radius:5.5px 5.5px 0 0;flex:0 0 auto}
+.bar h1{font-size:15px;font-weight:700;letter-spacing:.2px}
+.bar .sp{flex:1 1 auto}
+.famille{display:flex;gap:4px;background:rgba(255,255,255,.1);padding:3px;border-radius:999px}
+.famille button{background:none;border:0;color:#CFE2E1;padding:6px 14px;border-radius:999px;cursor:pointer;font-weight:600;font-size:12.5px}
+.famille button[aria-pressed="true"]{background:#fff;color:var(--profond)}
+.bar .act{background:var(--sable);color:var(--profond);border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer}
+.bar .act.ghost{background:rgba(255,255,255,.12);color:#fff}
+.bar .state{font-size:12px;color:var(--clair);min-width:7ch}
+
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:22px;
+  padding-inline:20px;padding-block:22px;max-width:1400px;margin:0 auto;align-items:start}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}}
+
+.col h2{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--vert);font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.col h2::before{content:"";width:9px;height:12px;background:var(--orange);border-radius:4.5px 4.5px 0 0}
+
+.palette{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
+.palette button{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer;font-size:12.5px;font-weight:500;color:var(--ink)}
+.palette button:hover{border-color:var(--vert);color:var(--vert)}
+
+.bloc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:11px;box-shadow:var(--shadow)}
+.bloc.drag{opacity:.45}
+.bloc.over{border-color:var(--vert);border-style:dashed}
+.btete{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:grab}
+.btete .poignee{color:var(--muted);font-size:15px;letter-spacing:-2px;user-select:none}
+.btete .nom{font-weight:600;font-size:13px;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btete .res{color:var(--muted);font-weight:400}
+.ico{background:none;border:0;cursor:pointer;color:var(--muted);padding:4px 6px;border-radius:6px;font-size:13px;line-height:1}
+.ico:hover{background:var(--surface-2);color:var(--vert)}
+.ico.sup:hover{color:#B3261E}
+.champs{padding:0 13px 13px;display:grid;gap:9px}
+.champ{display:grid;gap:4px}
+.champ label{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.champ input,.champ textarea{background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:8px 10px;width:100%}
+.champ textarea{min-height:88px;resize:vertical;line-height:1.5}
+.champ input:focus,.champ textarea:focus{outline:2px solid var(--vert);outline-offset:1px;border-color:transparent}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+@media (max-width:520px){.duo{grid-template-columns:1fr}}
+.aide{font-size:11.5px;color:var(--muted)}
+
+.vide{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:26px 20px;text-align:center;color:var(--muted)}
+
+.apercu{position:sticky;top:calc(env(safe-area-inset-top,0px) + 74px)}
+.ecran{display:flex;gap:5px;margin-bottom:10px}
+.ecran button{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:5px 11px;font-size:12px;cursor:pointer;color:var(--muted)}
+.ecran button[aria-pressed="true"]{background:var(--vert);border-color:var(--vert);color:#fff;font-weight:600}
+.cadre{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.cadre iframe{display:block;border:0;width:100%;height:68vh;background:#fff}
+.cadre.tel iframe{width:390px;margin:0 auto}
+
+.sortie{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:13px}
+.sortie textarea{width:100%;min-height:110px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
+  background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:9px}
+.rangee{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:9px}
+.btn{background:var(--vert);color:#fff;border:0;border-radius:8px;padding:9px 15px;font-weight:600;cursor:pointer}
+.btn.sec{background:var(--surface-2);color:var(--ink)}
+.note{font-size:11.5px;color:var(--muted);margin-top:7px}
+</style>
+
+<div class="bar">
+  <span class="arc"></span>
+  <h1>Atelier Newsletters</h1>
+  <div class="famille" id="famille" role="group" aria-label="Famille de lettre"></div>
+  <span class="sp"></span>
+  <span class="state" id="etat"></span>
+  <button class="act ghost" id="bEnr">Enregistrer</button>
+  <button class="act" id="bCopie">Copier le HTML</button>
+</div>
+
+<div class="wrap">
+  <div class="col">
+    <h2>Ajouter un bloc</h2>
+    <div class="palette" id="palette"></div>
+    <h2>Le numéro</h2>
+    <div id="liste"></div>
+  </div>
+
+  <div class="col apercu">
+    <h2>Aperçu</h2>
+    <div class="ecran">
+      <button id="eOrdi" aria-pressed="true">Ordinateur</button>
+      <button id="eTel" aria-pressed="false">Téléphone</button>
+    </div>
+    <div class="cadre" id="cadre"><iframe id="vue" title="Aperçu de la lettre"></iframe></div>
+    <div class="sortie">
+      <label class="champ"><span style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);font-weight:600">HTML à coller dans Mailchimp</span>
+      <textarea id="html" readonly spellcheck="false"></textarea></label>
+      <div class="rangee">
+        <button class="btn" id="bCopie2">Copier</button>
+        <button class="btn sec" id="bVider">Vider le numéro</button>
+        <span class="note" id="poids"></span>
+      </div>
+      <p class="note">Dans Mailchimp : Modèles &rsaquo; Codage personnalisé &rsaquo; Importer le fichier HTML, ou collez ce code dans une campagne. Le lien de désabonnement est déjà dedans.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================ CHARTE ============================ */
+const P = {vert:'#0A6F71',profond:'#073A3B',sable:'#F7BE47',orange:'#F5A600',clair:'#A2D2D2',
+  sableClair:'#FBE7B7',gris:'#EDF1F4',creme:'#FAF7F0',encre:'#12302F',grisvert:'#5E7473',
+  eau:'#E4F0F0',sablePale:'#FDF3DC'};
+const FONT="'Poppins','Century Gothic',Helvetica,Arial,sans-serif";
+const SCRIPT="'Neucha','Segoe Print','Bradley Hand',Georgia,cursive";
+
+const FAMILLES = {
+  veille:{nom:'Veille', fond:P.creme, accent:P.profond, enteteFond:P.profond, enteteSur:P.sable,
+          motif:'arche', sur:P.vert, surtitreDefaut:'Pôle Qualité & Plaidoyer', titreDefaut:"Veille protection de l'enfance"},
+  interne:{nom:'Interne', fond:P.sablePale, accent:P.vert, enteteFond:P.vert, enteteSur:P.sableClair,
+          motif:'disques', sur:P.profond, surtitreDefaut:"Lettre interne", titreDefaut:"Les nouvelles de l'Union"},
+  externe:{nom:'Externe', fond:'#FFFFFF', accent:P.orange, enteteFond:P.profond, enteteSur:P.sable,
+          motif:'photo', sur:P.orange, surtitreDefaut:"Lettre aux partenaires", titreDefaut:"Protéger l'enfant, faire éclore l'adulte"}
+};
+
+/* ====================== OUTILS DE RENDU E-MAIL ====================== */
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const p = (t,{size=16,lh=28,color=P.encre,weight=400,mb=16,extra=''}={}) =>
+  `<p style="margin:0 0 ${mb}px;font-family:${FONT};font-size:${size}px;line-height:${lh}px;font-weight:${weight};color:${color};${extra}">${t}</p>`;
+const surtitre = (t,c) => p(esc(t),{size:12,lh:18,color:c,weight:700,mb:10,extra:'letter-spacing:1.8px;text-transform:uppercase;'});
+const filet = (mb=30)=>`<hr style="border:0;border-top:1px solid ${P.gris};margin:0 0 ${mb}px;height:1px;" />`;
+const bouton = (txt,url,bg,fg)=>
+  `<a href="${esc(url||'#')}" target="_blank" style="display:inline-block;background-color:${bg};color:${fg};font-family:${FONT};font-size:16px;line-height:21px;font-weight:600;text-decoration:none;border-radius:6px;border-top:14px solid ${bg};border-bottom:14px solid ${bg};border-left:28px solid ${bg};border-right:28px solid ${bg};">${esc(txt)}</a>`;
+/* texte libre : lignes vides = paragraphes, « - » = puces, **gras** */
+function corps(txt,{color=P.encre,size=16,lh=28}={}){
+  const gras = s => esc(s).replace(/\*\*(.+?)\*\*/g,`<strong style="color:${color}">$1</strong>`);
+  return String(txt||'').split(/\n\s*\n/).map(bloc=>{
+    const lignes = bloc.split('\n').filter(l=>l.trim());
+    if(lignes.length && lignes.every(l=>/^\s*[-•]\s+/.test(l)))
+      return `<ul style="margin:0 0 16px;padding-left:20px;font-family:${FONT};font-size:${size}px;line-height:${lh}px;color:${color};">`
+        + lignes.map(l=>`<li style="margin:0 0 10px;">${gras(l.replace(/^\s*[-•]\s+/,''))}</li>`).join('') + `</ul>`;
+    return p(gras(bloc.replace(/\n/g,' ')),{size,lh,color});
+  }).join('');
+}
+const cellule = (c)=>`<tr><td class="px" bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:0 40px;">${c}</td></tr>`;
+
+/* ============================ BLOCS ============================ */
+const B = {
+  entete:{nom:'En-tête', unique:true, champs:[
+      {c:'surtitre',l:'Surtitre'},{c:'titre',l:'Titre'},{c:'mois',l:'Mois'},
+      {c:'image',l:'Image du bandeau (URL) — famille externe',aide:'Laissez vide pour un bandeau sans photo.'}],
+    resume:v=>v.titre, rendu:(v,F)=>{
+      const photo = (F.motif==='photo' && v.image) ?
+        `<tr><td style="font-size:0;line-height:0;"><img src="${esc(v.image)}" width="640" alt="" style="display:block;width:100%;max-width:640px;height:auto;border:0;" /></td></tr>` : '';
+      return `<tr><td bgcolor="${F.enteteFond}" class="px" style="background-color:${F.enteteFond};padding:0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${photo}
+        <tr><td style="padding:34px 40px 32px;">
+          <img src="https://www.unionpourlenfance.com/wp-content/uploads/2020/02/Logo-UPEblanc-768x384.png" width="180" alt="Union pour l'Enfance" style="display:block;width:180px;height:auto;border:0;margin:0 0 26px;font-family:${FONT};font-size:15px;color:#FFFFFF;" />
+          ${surtitre(v.surtitre,F.enteteSur)}
+          ${p(esc(v.titre),{size:32,lh:40,color:'#FFFFFF',weight:700,mb:8,extra:'letter-spacing:-0.3px;'})}
+          ${p(esc(v.mois),{size:17,lh:25,color:P.clair,weight:500,mb:0})}
+        </td></tr></table></td></tr>` + frise(F);
+    }},
+
+  edito:{nom:'Édito', champs:[
+      {c:'chapo',l:'Chapô',t:'textarea'},{c:'nom',l:'Signature — nom'},{c:'fonction',l:'Signature — fonction'}],
+    resume:v=>v.nom, rendu:(v,F)=>cellule(`<div class="rich">
+      ${p('*|IF:FNAME|*Chère, cher *|FNAME|*,*|ELSE:|*Chers collègues,*|END:IF|*',{size:18,lh:28,color:P.encre,weight:600,mb:14})}
+      ${corps(v.chapo)}
+      ${p('Bonne lecture !',{mb:14})}
+      ${p(esc(v.nom),{size:16,lh:24,color:F.accent,weight:700,mb:0})}
+      ${p(esc(v.fonction),{size:14,lh:21,color:P.grisvert,mb:30,extra:'font-style:italic;'})}</div>`)},
+
+  sommaire:{nom:'Sommaire', champs:[{c:'items',l:'Un temps fort par ligne',t:'textarea'}],
+    resume:v=>String(v.items||'').split('\n').filter(Boolean).length+' lignes',
+    rendu:(v,F)=>cellule(`<div class="rich"><div style="background-color:${F.fond};border-radius:8px;padding:24px 26px;margin:0 0 30px;">
+      ${surtitre('Au sommaire',F.accent)}
+      <ul style="margin:0;padding-left:20px;font-family:${FONT};font-size:16px;line-height:27px;color:${P.encre};">
+      ${String(v.items||'').split('\n').filter(l=>l.trim()).map(l=>`<li style="margin:0 0 10px;">${esc(l.replace(/^\s*[-•]\s*/,''))}</li>`).join('')}
+      </ul></div></div>`)},
+
+  rubrique:{nom:'Intitulé de rubrique', champs:[{c:'texte',l:'Intitulé'}],
+    resume:v=>v.texte, rendu:(v,F)=>cellule(`<div class="rich">${p(esc(v.texte),{size:13,lh:19,color:F.accent,weight:700,mb:18,extra:'letter-spacing:2px;text-transform:uppercase;'})}</div>`)},
+
+  article:{nom:'Article', champs:[
+      {c:'surtitre',l:'Surtitre'},{c:'titre',l:'Titre'},{c:'image',l:'Visuel (URL)'},
+      {c:'corps',l:'Corps',t:'textarea',aide:'Ligne vide = nouveau paragraphe. « - » en début de ligne = puce. **gras**'},
+      {c:'cta',l:'Bouton'},{c:'url',l:'Lien du bouton'}],
+    resume:v=>v.titre, rendu:(v,F)=>cellule(`<div class="rich">
+      ${v.surtitre?surtitre(v.surtitre,F.accent):''}
+      ${p(esc(v.titre),{size:24,lh:32,color:P.profond,weight:700,mb:18,extra:'letter-spacing:-0.2px;'})}
+      ${v.image?`<img src="${esc(v.image)}" width="560" alt="" style="display:block;width:100%;max-width:560px;height:auto;border:0;border-radius:${F.motif==='arche'?'140px 140px 8px 8px':'8px'};margin:0 0 20px;" />`:''}
+      ${corps(v.corps)}
+      ${v.cta?`<p style="margin:0 0 34px;">${bouton(v.cta,v.url,F.accent,'#FFFFFF')}</p>`:''}
+      ${filet()}</div>`)},
+
+  video:{nom:'Vidéo', champs:[
+      {c:'surtitre',l:'Surtitre'},{c:'titre',l:'Titre'},{c:'vignette',l:'Vignette (URL)'},
+      {c:'meta',l:'Durée et source'},{c:'texte',l:'Phrase de présentation'},{c:'url',l:'Lien de la vidéo'}],
+    resume:v=>v.titre, rendu:(v,F)=>cellule(`<div class="rich">
+      ${v.surtitre?surtitre(v.surtitre,F.accent):''}
+      ${p(esc(v.titre),{size:24,lh:32,color:P.profond,weight:700,mb:18,extra:'letter-spacing:-0.2px;'})}
+      ${v.vignette?`<a href="${esc(v.url||'#')}" target="_blank"><img src="${esc(v.vignette)}" width="560" alt="" style="display:block;width:100%;max-width:560px;height:auto;border:0;border-radius:8px 8px 0 0;" /></a>`:''}
+      <div style="background-color:${P.profond};border-radius:0 0 8px 8px;padding:22px 24px;margin:0 0 32px;">
+        ${p(esc(v.meta),{size:14,lh:22,color:P.clair,weight:500,mb:6})}
+        ${p(esc(v.texte),{size:16,lh:26,color:'#FFFFFF',mb:16})}
+        <p style="margin:0;">${bouton('▶  Regarder',v.url,P.sable,P.profond)}</p>
+      </div>${filet()}</div>`)},
+
+  indicateurs:{nom:'Indicateurs', champs:[
+      {c:'label',l:'Intitulé'},{c:'v1',l:'Chiffre 1'},{c:'l1',l:'Légende 1'},
+      {c:'v2',l:'Chiffre 2'},{c:'l2',l:'Légende 2'},{c:'v3',l:'Chiffre 3'},{c:'l3',l:'Légende 3'},{c:'source',l:'Source'}],
+    resume:v=>[v.v1,v.v2,v.v3].filter(Boolean).join(' · '),
+    rendu:(v,F)=>{const un=(val,leg)=>val?p(`<strong style="font-size:32px;line-height:40px;color:${F.accent};">${esc(val)}</strong><br />${esc(leg)}`,{size:16,lh:26,color:P.grisvert,mb:14}):'';
+      return cellule(`<div class="rich"><div style="background-color:${P.gris};border-radius:8px;padding:26px 24px;margin:0 0 28px;">
+      ${surtitre(v.label||'Ce qu\'en disent les chiffres',F.accent)}
+      ${un(v.v1,v.l1)}${un(v.v2,v.l2)}${un(v.v3,v.l3)}
+      ${v.source?p(esc(v.source),{size:12,lh:19,color:P.grisvert,mb:0,extra:'font-style:italic;'}):''}
+      </div></div>`)}},
+
+  chiffre:{nom:'Chiffre clé', champs:[{c:'surtitre',l:'Surtitre'},{c:'valeur',l:'Chiffre'},{c:'legende',l:'Légende'},{c:'source',l:'Source'}],
+    resume:v=>v.valeur, rendu:(v,F)=>cellule(`<div class="rich">
+      <div style="background-color:${P.profond};border-radius:${F.motif==='arche'?'140px 140px 8px 8px':'8px'};padding:38px 32px 32px;margin:0 0 28px;text-align:center;">
+      ${p(esc(v.surtitre||'Le chiffre du mois'),{size:12,lh:18,color:P.clair,weight:700,mb:10,extra:'letter-spacing:1.8px;text-transform:uppercase;text-align:center;'})}
+      ${p(esc(v.valeur),{size:48,lh:54,color:P.sable,weight:700,mb:10,extra:'text-align:center;'})}
+      ${p(esc(v.legende),{size:16,lh:26,color:'#FFFFFF',mb:12,extra:'text-align:center;'})}
+      ${v.source?p(esc(v.source),{size:12,lh:19,color:P.clair,mb:0,extra:'font-style:italic;text-align:center;'}):''}
+      </div></div>`)},
+
+  citation:{nom:'Citation', champs:[{c:'texte',l:'Verbatim'},{c:'auteur',l:'Auteur'}],
+    resume:v=>v.texte, rendu:(v,F)=>cellule(`<div class="rich">
+      <div style="background-color:${P.sableClair};border-left:4px solid ${P.orange};border-radius:6px;padding:28px;margin:0 0 28px;">
+      <p style="margin:0 0 12px;font-family:${SCRIPT};font-size:22px;line-height:32px;color:${P.profond};">« ${esc(v.texte)} »</p>
+      ${p(esc(v.auteur),{size:14,lh:21,color:P.grisvert,weight:600,mb:0})}</div></div>`)},
+
+  bonus:{nom:'Bonus culturel', champs:[{c:'type',l:'Type'},{c:'titre',l:'Titre'},{c:'texte',l:'Résumé',t:'textarea'},{c:'lien',l:'Libellé du lien'},{c:'url',l:'Lien'}],
+    resume:v=>v.titre, rendu:(v,F)=>cellule(`<div class="rich">
+      <div style="background-color:${P.gris};border-radius:8px;padding:24px 26px;margin:0 0 14px;">
+      ${v.type?p(esc(v.type),{size:12,lh:18,color:P.grisvert,weight:700,mb:6,extra:'letter-spacing:1.6px;text-transform:uppercase;'}):''}
+      ${p(esc(v.titre),{size:18,lh:26,color:P.profond,weight:700,mb:10})}
+      ${corps(v.texte,{size:16,lh:27})}
+      ${v.lien?`<p style="margin:0;"><a href="${esc(v.url||'#')}" target="_blank" style="font-family:${FONT};font-size:15px;line-height:22px;font-weight:600;color:${F.accent};text-decoration:underline;">${esc(v.lien)} &rsaquo;</a></p>`:''}
+      </div></div>`)},
+
+  ressource:{nom:'Ressource', champs:[{c:'titre',l:'Titre'},{c:'texte',l:'Résumé',t:'textarea'},{c:'lien',l:'Libellé du lien'},{c:'url',l:'Lien'}],
+    resume:v=>v.titre, rendu:(v,F)=>cellule(`<div class="rich">
+      ${p(esc(v.titre),{size:18,lh:26,color:P.profond,weight:700,mb:8})}
+      ${corps(v.texte,{size:16,lh:27})}
+      ${v.lien?`<p style="margin:0 0 20px;"><a href="${esc(v.url||'#')}" target="_blank" style="font-family:${FONT};font-size:15px;line-height:22px;font-weight:600;color:${F.accent};text-decoration:underline;">${esc(v.lien)} &rsaquo;</a></p>`:''}
+      ${filet(20)}</div>`)},
+
+  rdv:{nom:'Rendez-vous', champs:[{c:'date',l:'Date'},{c:'titre',l:'Titre'},{c:'meta',l:'Format, horaire, lieu, tarif'},{c:'texte',l:'Présentation',t:'textarea'},{c:'cta',l:'Bouton'},{c:'url',l:'Lien'}],
+    resume:v=>(v.date?v.date+' — ':'')+(v.titre||''),
+    rendu:(v,F)=>cellule(`<div class="rich"><div style="background-color:${P.profond};border-radius:8px;padding:24px 26px;margin:0 0 14px;">
+      ${v.date?p(esc(v.date),{size:13,lh:19,color:P.sable,weight:700,mb:8,extra:'letter-spacing:1.6px;text-transform:uppercase;'}):''}
+      ${p(esc(v.titre),{size:18,lh:26,color:'#FFFFFF',weight:700,mb:8})}
+      ${v.meta?p(esc(v.meta),{size:14,lh:22,color:P.clair,weight:500,mb:12}):''}
+      ${corps(v.texte,{color:'#E6EFEE',size:16,lh:26})}
+      ${v.cta?`<p style="margin:0;">${bouton(v.cta,v.url,P.sable,P.profond)}</p>`:''}
+      </div></div>`)},
+
+  formation:{nom:'Formation', champs:[{c:'titre',l:'Intitulé'},{c:'meta',l:'Lieu, dates, durée, tarif'}],
+    resume:v=>v.titre, rendu:(v,F)=>cellule(`<div class="rich">
+      <div style="background-color:${P.eau};border-left:3px solid ${F.accent};border-radius:6px;padding:16px 18px;margin:0 0 12px;">
+      ${p(esc(v.titre),{size:16,lh:24,color:P.profond,weight:600,mb:5})}
+      ${p(esc(v.meta),{size:14,lh:21,color:P.grisvert,mb:0})}</div></div>`)},
+
+  sondage:{nom:'Sondage', champs:[{c:'label',l:'Intitulé'},{c:'question',l:'Question'},{c:'precision',l:'Précision'},
+      {c:'r1',l:'Réponse 1'},{c:'u1',l:'Lien 1'},{c:'r2',l:'Réponse 2'},{c:'u2',l:'Lien 2'},{c:'r3',l:'Réponse 3'},{c:'u3',l:'Lien 3'}],
+    resume:v=>v.question, rendu:(v,F)=>cellule(`<div class="rich">
+      <div style="background-color:${P.eau};border-radius:8px;padding:26px 24px;margin:0 0 28px;">
+      ${surtitre(v.label||'La question du mois',F.accent)}
+      ${p(esc(v.question),{size:19,lh:28,color:P.profond,weight:700,mb:6})}
+      ${v.precision?p(esc(v.precision),{size:14,lh:22,color:P.grisvert,mb:18}):''}
+      ${v.r1?`<p style="margin:0 0 10px;">${bouton(v.r1,v.u1,F.accent,'#FFFFFF')}</p>`:''}
+      ${v.r2?`<p style="margin:0 0 10px;">${bouton(v.r2,v.u2,P.sable,P.profond)}</p>`:''}
+      ${v.r3?`<p style="margin:0;">${bouton(v.r3,v.u3,P.orange,P.encre)}</p>`:''}
+      </div></div>`)},
+
+  participation:{nom:'Participation', champs:[{c:'titre',l:'Titre'},{c:'texte',l:'Texte',t:'textarea'},{c:'cta',l:'Bouton'},{c:'url',l:'Lien ou mailto:'}],
+    resume:v=>v.titre, rendu:(v,F)=>cellule(`<div class="rich">
+      <div style="background-color:${P.sablePale};border-radius:8px;padding:28px;margin:0 0 32px;text-align:center;">
+      ${p(esc(v.titre),{size:19,lh:28,color:P.profond,weight:700,mb:8,extra:'text-align:center;'})}
+      ${p(esc(v.texte),{size:16,lh:26,mb:18,extra:'text-align:center;'})}
+      ${v.cta?`<p style="margin:0;text-align:center;">${bouton(v.cta,v.url,P.orange,P.encre)}</p>`:''}
+      </div></div>`)},
+
+  pied:{nom:'Pied de page', unique:true, champs:[{c:'signature',l:'Signature de marque'},{c:'adresse',l:'Adresse et téléphone'},{c:'mentions',l:'Mentions',t:'textarea'}],
+    resume:()=>'', rendu:(v,F)=>`<tr><td bgcolor="${P.profond}" class="px" style="background-color:${P.profond};padding:38px 40px 30px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr><td align="center" style="padding:0 0 22px;"><img src="https://www.unionpourlenfance.com/wp-content/uploads/2020/02/Logo-UPEblanc-768x384.png" width="168" alt="Union pour l'Enfance" style="display:block;width:168px;height:auto;border:0;margin:0 auto;font-family:${FONT};font-size:14px;color:#FFFFFF;" /></td></tr>
+      <tr><td align="center" style="font-family:${SCRIPT};font-size:20px;line-height:29px;color:${P.sable};padding:0 0 24px;">${esc(v.signature)}</td></tr>
+      <tr><td align="center" style="font-family:${FONT};font-size:14px;line-height:23px;font-weight:600;color:${P.clair};padding:0 0 22px;">
+        <a href="https://fr.linkedin.com/company/union-pour-l-enfance" style="color:#FFFFFF;text-decoration:none;">LinkedIn</a><span style="color:#2E8A8B;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+        <a href="https://www.facebook.com/unionpourenfance/" style="color:#FFFFFF;text-decoration:none;">Facebook</a><span style="color:#2E8A8B;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+        <a href="https://www.instagram.com/unionpourlenfance/" style="color:#FFFFFF;text-decoration:none;">Instagram</a><span style="color:#2E8A8B;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+        <a href="https://www.youtube.com/@unionpourlenfance" style="color:#FFFFFF;text-decoration:none;">YouTube</a></td></tr>
+      <tr><td style="border-top:1px solid #12504F;font-size:0;line-height:0;padding:0 0 22px;">&nbsp;</td></tr>
+      <tr><td align="center" style="font-family:${FONT};font-size:14px;line-height:23px;color:${P.clair};padding:0 0 16px;">
+        <strong style="color:#FFFFFF;">Union pour l'Enfance</strong><br />${esc(v.adresse)}<br />
+        <a href="https://www.unionpourlenfance.com" style="color:${P.sable};text-decoration:underline;">www.unionpourlenfance.com</a></td></tr>
+      <tr><td align="center" style="font-family:${FONT};font-size:12px;line-height:20px;color:#7FA3A2;padding:0 0 18px;">${esc(v.mentions).replace(/\n/g,'<br />')}</td></tr>
+      <tr><td align="center" style="font-family:${FONT};font-size:12px;line-height:21px;color:#7FA3A2;">
+        <a href="*|UPDATE_PROFILE|*" style="color:${P.clair};text-decoration:underline;">Modifier mes préférences</a>
+        <span style="color:#2E8A8B;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+        <a href="*|UNSUB|*" style="color:${P.clair};text-decoration:underline;">Me désabonner</a><br /><br />
+        <span style="color:${P.grisvert};">*|LIST:ADDRESS|*</span></td></tr>
+      </table></td></tr>`}
+};
+
+/* frise de demi-disques, signature de la lettre interne */
+function frise(F){
+  if(F.motif!=='disques') return '';
+  const col=[P.vert,null,P.sable,P.orange,null,P.vert,P.sable,null,P.orange,P.vert,null,P.sable,P.vert,null,P.orange,P.vert];
+  return `<tr><td bgcolor="#FFFFFF" style="background-color:#FFFFFF;font-size:0;line-height:0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>`
+    + col.map(c=>c?`<td width="40" height="20" valign="top" style="width:40px;height:20px;font-size:0;line-height:0;"><div style="height:20px;background-color:${c};border-radius:0 0 20px 20px;font-size:0;line-height:0;">&nbsp;</div></td>`
+      :`<td width="40" height="20" style="width:40px;height:20px;font-size:0;line-height:0;">&nbsp;</td>`).join('')
+    + `</tr></table></td></tr>`;
+}
+
+/* ====================== DOCUMENT COMPLET ====================== */
+function document_email(etat){
+  const F = Object.assign({}, FAMILLES[etat.famille]);
+  const corpsHTML = etat.blocs.map(b=>B[b.type] ? B[b.type].rendu(b.v,F) : '').join('');
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="x-apple-disable-message-reformatting" />
+<meta name="color-scheme" content="light dark" /><meta name="supported-color-schemes" content="light dark" />
+<title>${esc(etat.titre||'Union pour l\'Enfance')}</title>
+<!--[if mso]><xml><o:OfficeDocumentSettings xmlns:o="urn:schemas-microsoft-com:office:office"><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
+<!--[if !mso]><!--><link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Neucha&display=swap" rel="stylesheet" type="text/css" /><!--<![endif]-->
+<style type="text/css">
+html,body{margin:0 !important;padding:0 !important;width:100% !important}
+table,td{mso-table-lspace:0pt !important;mso-table-rspace:0pt !important;border-collapse:collapse !important}
+img{-ms-interpolation-mode:bicubic;border:0;height:auto;line-height:100%;outline:none;text-decoration:none;display:block}
+.rich a{text-decoration:underline}
+@media only screen and (max-width:640px){
+  .wrapmail{width:100% !important;max-width:100% !important}
+  .px{padding-left:20px !important;padding-right:20px !important}
+  .rich p,.rich li{font-size:17px !important;line-height:29px !important}
+  .rich img{width:100% !important;max-width:100% !important;height:auto !important}
+}
+@media (prefers-color-scheme:dark){ body,.page{background-color:#0B1A1A !important} }
+</style></head>
+<body style="margin:0;padding:0;background-color:${F.fond};">
+<div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">${esc(etat.apercuTexte||'')}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="page" style="background-color:${F.fond};">
+<tr><td align="center" style="padding:0;">
+<!--[if mso]><table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+<table role="presentation" class="wrapmail" width="640" cellpadding="0" cellspacing="0" border="0" style="width:640px;max-width:640px;margin:0 auto;">
+<tr><td align="center" class="px" style="padding:14px 32px;font-family:${FONT};font-size:13px;line-height:19px;color:${P.grisvert};">
+<a href="*|ARCHIVE|*" style="color:${P.grisvert};text-decoration:underline;">Afficher cet e-mail dans votre navigateur</a></td></tr>
+${corpsHTML}
+<tr><td style="height:32px;font-size:0;line-height:0;">&nbsp;</td></tr>
+</table>
+<!--[if mso]></td></tr></table><![endif]-->
+</td></tr></table></body></html>`;
+}
+
+/* ============================ ÉTAT ============================ */
+const DEFAUTS = {
+  entete:f=>({surtitre:FAMILLES[f].surtitreDefaut,titre:FAMILLES[f].titreDefaut,mois:'',image:''}),
+  edito:()=>({chapo:'',nom:'',fonction:''}),
+  sommaire:()=>({items:''}),
+  rubrique:()=>({texte:''}),
+  article:()=>({surtitre:'',titre:'',image:'',corps:'',cta:'Lire la suite ›',url:''}),
+  video:()=>({surtitre:'À regarder',titre:'',vignette:'',meta:'',texte:'',url:''}),
+  indicateurs:()=>({label:"Ce qu'en disent les chiffres",v1:'',l1:'',v2:'',l2:'',v3:'',l3:'',source:''}),
+  chiffre:()=>({surtitre:'Le chiffre du mois',valeur:'',legende:'',source:''}),
+  citation:()=>({texte:'',auteur:''}),
+  bonus:()=>({type:'',titre:'',texte:'',lien:'En savoir plus',url:''}),
+  ressource:()=>({titre:'',texte:'',lien:'Consulter',url:''}),
+  rdv:()=>({date:'',titre:'',meta:'',texte:'',cta:'Inscription ›',url:''}),
+  formation:()=>({titre:'',meta:''}),
+  sondage:()=>({label:'La question du mois',question:'',precision:'Un clic suffit.',r1:'',u1:'',r2:'',u2:'',r3:'',u3:''}),
+  participation:()=>({titre:'',texte:'',cta:'Nous écrire ›',url:'mailto:communication@unionpourlenfance.com'}),
+  pied:()=>({signature:"Protéger l'enfant, faire éclore l'adulte",adresse:'174 quai de Jemmapes, 75010 Paris · 01 83 92 33 26',
+    mentions:"Association reconnue d'utilité publique, habilitée à recevoir legs, donations et assurances-vie.\nDons IFI et dons de titres boursiers possibles."})
+};
+
+let etat = depart('veille');
+function depart(f){
+  const n=(t)=>({id:uid(),type:t,v:DEFAUTS[t](f)});
+  const e={famille:f,titre:'',apercuTexte:'',blocs:[n('entete'),n('edito'),n('sommaire'),n('article'),n('pied')]};
+  e.blocs[1].v={chapo:"Nouveau numéro, nouveaux temps forts dans l'actualité récente de la protection de l'enfance.",nom:'Camille Pinget',fonction:'Responsable Qualité & Plaidoyer'};
+  e.blocs[2].v={items:"Premier temps fort du numéro\nDeuxième temps fort\nTroisième temps fort"};
+  e.blocs[3].v={surtitre:'Plaidoyer',titre:"Titre de l'article",image:'',corps:"Remplacez ce texte par le corps de l'article.\n\n- Une puce\n- Une autre puce",cta:'Lire la suite ›',url:''};
+  e.blocs[0].v.mois=new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'}).replace(/^./,c=>c.toUpperCase());
+  return e;
+}
+function uid(){return 'b'+Math.random().toString(36).slice(2,9)}
+
+/* ============================ INTERFACE ============================ */
+const $=s=>document.querySelector(s);
+const elFam=$('#famille'), elPal=$('#palette'), elListe=$('#liste'), elVue=$('#vue'), elHtml=$('#html'), elEtat=$('#etat');
+
+Object.entries(FAMILLES).forEach(([cle,F])=>{
+  const b=document.createElement('button'); b.textContent=F.nom; b.dataset.f=cle;
+  b.onclick=()=>{ etat.famille=cle; const e=etat.blocs.find(x=>x.type==='entete');
+    if(e){ const d=DEFAUTS.entete(cle); if(!e.v.titre||Object.values(FAMILLES).some(x=>x.titreDefaut===e.v.titre)) e.v.titre=d.titre;
+      if(!e.v.surtitre||Object.values(FAMILLES).some(x=>x.surtitreDefaut===e.v.surtitre)) e.v.surtitre=d.surtitre; }
+    dessine(); };
+  elFam.appendChild(b);
+});
+
+Object.entries(B).forEach(([cle,bl])=>{
+  if(bl.unique) return;
+  const b=document.createElement('button'); b.textContent='+ '+bl.nom;
+  b.onclick=()=>{ const i=etat.blocs.findIndex(x=>x.type==='pied');
+    const nouveau={id:uid(),type:cle,v:DEFAUTS[cle](etat.famille)};
+    etat.blocs.splice(i<0?etat.blocs.length:i,0,nouveau); dessine();
+    setTimeout(()=>document.getElementById(nouveau.id)?.scrollIntoView({block:'center',behavior:'smooth'}),30); };
+  elPal.appendChild(b);
+});
+
+let glisse=null;
+function dessine(){
+  [...elFam.children].forEach(b=>b.setAttribute('aria-pressed', b.dataset.f===etat.famille));
+  elListe.innerHTML='';
+  if(!etat.blocs.length) elListe.innerHTML='<div class="vide">Aucun bloc. Ajoutez-en depuis la palette ci-dessus.</div>';
+  etat.blocs.forEach((b,i)=>{
+    const def=B[b.type]; if(!def) return;
+    const carte=document.createElement('div'); carte.className='bloc'; carte.id=b.id; carte.draggable=true;
+    const res=def.resume(b.v)||'';
+    carte.innerHTML=`<div class="btete"><span class="poignee">⠿</span>
+      <span class="nom">${esc(def.nom)}${res?` <span class="res">— ${esc(res).slice(0,46)}</span>`:''}</span>
+      <button class="ico" data-a="h" title="Monter" aria-label="Monter">▲</button>
+      <button class="ico" data-a="b" title="Descendre" aria-label="Descendre">▼</button>
+      ${def.unique?'':'<button class="ico" data-a="d" title="Dupliquer" aria-label="Dupliquer">⧉</button>'}
+      ${def.unique?'':'<button class="ico sup" data-a="x" title="Supprimer" aria-label="Supprimer">✕</button>'}</div>
+      <div class="champs"></div>`;
+    const zone=carte.querySelector('.champs');
+    def.champs.forEach(c=>{
+      const d=document.createElement('div'); d.className='champ';
+      const id=b.id+'_'+c.c;
+      d.innerHTML=`<label for="${id}">${esc(c.l)}</label>`+
+        (c.t==='textarea'?`<textarea id="${id}"></textarea>`:`<input id="${id}" type="text" />`)+
+        (c.aide?`<span class="aide">${c.aide}</span>`:'');
+      const f=d.querySelector('input,textarea'); f.value=b.v[c.c]??'';
+      f.addEventListener('input',()=>{ b.v[c.c]=f.value; rafraichit(); majResume(carte,def,b); });
+      zone.appendChild(d);
+    });
+    carte.querySelectorAll('.ico').forEach(btn=>btn.onclick=e=>{e.stopPropagation();
+      const a=btn.dataset.a;
+      if(a==='h'&&i>0){ [etat.blocs[i-1],etat.blocs[i]]=[etat.blocs[i],etat.blocs[i-1]]; }
+      if(a==='b'&&i<etat.blocs.length-1){ [etat.blocs[i+1],etat.blocs[i]]=[etat.blocs[i],etat.blocs[i+1]]; }
+      if(a==='d'){ etat.blocs.splice(i+1,0,{id:uid(),type:b.type,v:JSON.parse(JSON.stringify(b.v))}); }
+      if(a==='x'){ etat.blocs.splice(i,1); }
+      dessine(); });
+    carte.addEventListener('dragstart',e=>{glisse=b.id;carte.classList.add('drag');e.dataTransfer.effectAllowed='move'});
+    carte.addEventListener('dragend',()=>{glisse=null;carte.classList.remove('drag');
+      document.querySelectorAll('.bloc.over').forEach(x=>x.classList.remove('over'))});
+    carte.addEventListener('dragover',e=>{e.preventDefault();if(glisse&&glisse!==b.id)carte.classList.add('over')});
+    carte.addEventListener('dragleave',()=>carte.classList.remove('over'));
+    carte.addEventListener('drop',e=>{e.preventDefault();carte.classList.remove('over');
+      if(!glisse||glisse===b.id)return;
+      const de=etat.blocs.findIndex(x=>x.id===glisse), vers=etat.blocs.findIndex(x=>x.id===b.id);
+      const [m]=etat.blocs.splice(de,1); etat.blocs.splice(vers,0,m); dessine();});
+    elListe.appendChild(carte);
+  });
+  rafraichit();
+}
+function majResume(carte,def,b){
+  const res=def.resume(b.v)||'';
+  carte.querySelector('.nom').innerHTML=`${esc(def.nom)}${res?` <span class="res">— ${esc(res).slice(0,46)}</span>`:''}`;
+}
+
+let minuteur=null;
+/* l'aperçu remplace les balises de personnalisation par ce que verra le destinataire */
+function lisible(doc){
+  return doc
+    .replace(/\*\|IF:FNAME\|\*(.*?)\*\|ELSE:\|\*.*?\*\|END:IF\|\*/g,'$1')
+    .replace(/\*\|FNAME\|\*/g,'Yelena')
+    .replace(/\*\|ARCHIVE\|\*|\*\|UNSUB\|\*|\*\|UPDATE_PROFILE\|\*/g,'#')
+    .replace(/\*\|LIST:ADDRESS\|\*/g,"Union pour l'Enfance · 174 quai de Jemmapes · 75010 Paris");
+}
+function rafraichit(){
+  const doc=document_email(etat);
+  elHtml.value=doc;
+  $('#poids').textContent=Math.round(new Blob([doc]).size/1024)+' Ko';
+  clearTimeout(minuteur);
+  minuteur=setTimeout(()=>{ elVue.srcdoc=lisible(doc); }, 160);
+}
+
+$('#eOrdi').onclick=()=>{$('#cadre').classList.remove('tel');$('#eOrdi').setAttribute('aria-pressed','true');$('#eTel').setAttribute('aria-pressed','false')};
+$('#eTel').onclick=()=>{$('#cadre').classList.add('tel');$('#eTel').setAttribute('aria-pressed','true');$('#eOrdi').setAttribute('aria-pressed','false')};
+
+async function copier(){
+  try{ await navigator.clipboard.writeText(elHtml.value); flash('Copié'); }
+  catch(e){ elHtml.focus(); elHtml.select(); flash('Sélectionné — faites Ctrl+C'); }
+}
+$('#bCopie').onclick=copier; $('#bCopie2').onclick=copier;
+$('#bVider').onclick=()=>{ etat=depart(etat.famille); dessine(); flash('Numéro réinitialisé'); };
+
+function flash(t){ elEtat.textContent=t; clearTimeout(flash.t); flash.t=setTimeout(()=>elEtat.textContent='',2600); }
+
+/* ====================== SAUVEGARDE ======================
+   Dans Claude : base partagée, le numéro passe d'une personne à l'autre.
+   Hébergé ailleurs (GitHub Pages) : sauvegarde locale au navigateur.      */
+const sessionId = uid();
+let db=null, local=false;
+const CLE='upe-atelier-numero';
+
+function chargeLocal(){
+  try{ const t=localStorage.getItem(CLE); if(t){ const o=JSON.parse(t); if(o&&o.blocs){ etat=o; dessine(); flash('Numéro repris'); } } }catch(e){}
+}
+function enregistreLocal(){
+  try{ localStorage.setItem(CLE, JSON.stringify(etat)); flash('Enregistré sur cet ordinateur'); }
+  catch(e){ flash('Sauvegarde impossible'); }
+}
+
+(async()=>{
+  try{
+    db = window.claude?.use ? await window.claude.use('db') : null;
+  }catch(e){ db=null; }
+  if(!db){ local=true; $('#bEnr').title="Enregistre dans ce navigateur"; chargeLocal(); return; }
+  try{
+    const doc = db.doc('numeros/courant');
+    const snap = await doc.get();
+    if(snap?.data?.blocs){ etat = snap.data; dessine(); flash('Numéro repris'); }
+    doc.onSnapshot?.(s=>{ if(s?.data?.majPar && s.data.majPar!==sessionId && JSON.stringify(s.data)!==JSON.stringify(etat)){
+      etat=s.data; dessine(); flash('Mis à jour'); }});
+  }catch(e){}
+})();
+
+$('#bEnr').onclick=async()=>{
+  if(local||!db){ enregistreLocal(); return; }
+  try{ await db.doc('numeros/courant').set(Object.assign({},etat,{majPar:sessionId,majLe:Date.now()}));
+       flash('Enregistré et partagé'); }
+  catch(e){ enregistreLocal(); }
+};
+
+dessine();
+</script>
+
+</body>
+</html>
