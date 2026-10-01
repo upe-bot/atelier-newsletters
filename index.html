@@ -129,6 +129,20 @@ h1,h2,h3{margin:0;text-wrap:balance}
       </div>
       <p class="note">Dans Mailchimp : Modèles &rsaquo; Codage personnalisé &rsaquo; Importer le fichier HTML, ou collez ce code dans une campagne. Le lien de désabonnement est déjà dedans.</p>
     </div>
+
+    <div class="sortie">
+      <h3 style="font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--vert);font-weight:700;margin:0 0 8px;">Transmettre ce numéro</h3>
+      <p class="note" style="margin:0 0 9px;">Pour passer le numéro à quelqu'un d'autre : copiez le code, envoyez-le par message, l'autre personne le colle ici. Tout le numéro voyage dedans.</p>
+      <div class="rangee" style="margin-top:0;">
+        <button class="btn" id="bCopieNum">Copier le numéro</button>
+        <button class="btn sec" id="bColleNum">Coller un numéro</button>
+      </div>
+      <label class="champ" style="margin-top:9px;" id="zoneCode" hidden>
+        <span style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);font-weight:600">Collez le code reçu, puis Reprendre</span>
+        <textarea id="codeRecu" spellcheck="false" style="min-height:70px;font-family:ui-monospace,Menlo,monospace;font-size:11px;"></textarea>
+        <span class="rangee"><button class="btn" id="bReprendre" type="button">Reprendre ce numéro</button></span>
+      </label>
+    </div>
   </div>
 </div>
 
@@ -524,39 +538,59 @@ $('#bVider').onclick=()=>{ etat=depart(etat.famille); dessine(); flash('Numéro 
 function flash(t){ elEtat.textContent=t; clearTimeout(flash.t); flash.t=setTimeout(()=>elEtat.textContent='',2600); }
 
 /* ====================== SAUVEGARDE ======================
-   Dans Claude : base partagée, le numéro passe d'une personne à l'autre.
-   Hébergé ailleurs (GitHub Pages) : sauvegarde locale au navigateur.      */
+   Hors de Claude : sauvegarde locale au navigateur. Pour passer le numéro
+   à quelqu'un, utilisez « Copier le numéro » plus bas.                    */
 const sessionId = uid();
-let db=null, local=false;
 const CLE='upe-atelier-numero';
-
-function chargeLocal(){
-  try{ const t=localStorage.getItem(CLE); if(t){ const o=JSON.parse(t); if(o&&o.blocs){ etat=o; dessine(); flash('Numéro repris'); } } }catch(e){}
-}
-function enregistreLocal(){
+try{ const t=localStorage.getItem(CLE); if(t){ const o=JSON.parse(t); if(o&&o.blocs){ etat=o; } } }catch(e){}
+$('#bEnr').title="Enregistre dans ce navigateur";
+$('#bEnr').onclick=()=>{
   try{ localStorage.setItem(CLE, JSON.stringify(etat)); flash('Enregistré sur cet ordinateur'); }
   catch(e){ flash('Sauvegarde impossible'); }
+};
+
+/* ============ TRANSMETTRE UN NUMÉRO ============
+   Le numéro entier est compressé puis encodé en texte : un seul code à envoyer,
+   qui ne dépend d'aucun serveur. Fonctionne partout où la page est ouverte.   */
+const b64 = u8 => { let s=''; u8.forEach(o=>s+=String.fromCharCode(o));
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); };
+const deB64 = t => { const s=atob(t.replace(/-/g,'+').replace(/_/g,'/'));
+  const u=new Uint8Array(s.length); for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i); return u; };
+
+async function versCode(obj){
+  const octets = new TextEncoder().encode(JSON.stringify(obj));
+  if(!('CompressionStream' in window)) return 'UPE1.'+b64(octets);
+  const flux = new Blob([octets]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+  return 'UPE2.'+b64(new Uint8Array(await new Response(flux).arrayBuffer()));
+}
+async function depuisCode(txt){
+  const t = txt.trim().replace(/\s+/g,'');
+  const i = t.indexOf('.'); if(i<0) throw new Error('format');
+  const tete = t.slice(0,i), corps = deB64(t.slice(i+1));
+  if(tete==='UPE1') return JSON.parse(new TextDecoder().decode(corps));
+  if(tete==='UPE2'){
+    const flux = new Blob([corps]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return JSON.parse(await new Response(flux).text());
+  }
+  throw new Error('format');
 }
 
-(async()=>{
+$('#bCopieNum').onclick=async()=>{
   try{
-    db = window.claude?.use ? await window.claude.use('db') : null;
-  }catch(e){ db=null; }
-  if(!db){ local=true; $('#bEnr').title="Enregistre dans ce navigateur"; chargeLocal(); return; }
+    const code = await versCode(etat);
+    try{ await navigator.clipboard.writeText(code); flash('Code copié — '+Math.round(code.length/1024)+' Ko'); }
+    catch(e){ $('#zoneCode').hidden=false; $('#codeRecu').value=code; $('#codeRecu').select(); flash('Sélectionné — faites Ctrl+C'); }
+  }catch(e){ flash('Impossible de produire le code'); }
+};
+$('#bColleNum').onclick=()=>{ const z=$('#zoneCode'); z.hidden=!z.hidden; if(!z.hidden){ $('#codeRecu').value=''; $('#codeRecu').focus(); } };
+$('#bReprendre').onclick=async()=>{
+  const txt=$('#codeRecu').value;
+  if(!txt.trim()){ flash('Collez d\'abord un code'); return; }
   try{
-    const doc = db.doc('numeros/courant');
-    const snap = await doc.get();
-    if(snap?.data?.blocs){ etat = snap.data; dessine(); flash('Numéro repris'); }
-    doc.onSnapshot?.(s=>{ if(s?.data?.majPar && s.data.majPar!==sessionId && JSON.stringify(s.data)!==JSON.stringify(etat)){
-      etat=s.data; dessine(); flash('Mis à jour'); }});
-  }catch(e){}
-})();
-
-$('#bEnr').onclick=async()=>{
-  if(local||!db){ enregistreLocal(); return; }
-  try{ await db.doc('numeros/courant').set(Object.assign({},etat,{majPar:sessionId,majLe:Date.now()}));
-       flash('Enregistré et partagé'); }
-  catch(e){ enregistreLocal(); }
+    const o = await depuisCode(txt);
+    if(!o || !Array.isArray(o.blocs)) throw new Error('contenu');
+    etat = o; dessine(); $('#zoneCode').hidden=true; flash('Numéro repris');
+  }catch(e){ flash('Code non reconnu'); }
 };
 
 dessine();

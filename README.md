@@ -3,7 +3,10 @@
 Outil de fabrication des lettres d'information de l'Union pour l'Enfance.
 On empile des blocs, on les met dans l'ordre voulu, on copie le HTML obtenu dans Mailchimp.
 
-**Ouvrir l'atelier :** https://VOTRE-COMPTE.github.io/NOM-DU-DEPOT/
+**Ouvrir l'atelier :** https://upe-bot.github.io/atelier-newsletters/
+
+Cette adresse ne répondra qu'une fois le dépôt rendu public et GitHub Pages activé
+(Settings → Pages → *Deploy from a branch* → `main` / `/ (root)`).
 
 ## Ce que ça fait
 
@@ -39,12 +42,18 @@ Les textes se saisissent en clair. Trois conventions dans les champs longs :
 | `- texte` en début de ligne | une puce |
 | `**texte**` | du gras |
 
-## Sauvegarde
+## Sauvegarde et passage de relais
 
-Le bouton **Enregistrer** garde le numéro en cours dans le navigateur
-(stockage local, propre à l'ordinateur et au navigateur utilisés).
-La version hébergée dans Claude dispose en plus d'une sauvegarde partagée
-entre les personnes qui ont accès à la page.
+**Enregistrer** garde le numéro en cours dans le navigateur — propre à l'ordinateur
+et au navigateur utilisés. GitHub Pages ne sert que des fichiers : il n'y a pas de
+serveur pour partager quoi que ce soit, donc pas de sauvegarde commune de ce côté.
+
+Pour passer un numéro à quelqu'un d'autre, le bloc **Transmettre ce numéro** produit
+un code qui contient tout le numéro, compressé. On l'envoie par message, l'autre
+personne le colle et reprend le travail là où il en était. Aucun compte, aucun serveur.
+
+La version hébergée dans Claude a en plus une sauvegarde réellement commune : deux
+personnes ouvrant la même page voient le même numéro.
 
 ## Charte appliquée
 
