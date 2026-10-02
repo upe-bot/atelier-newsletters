@@ -42,10 +42,15 @@ Le bloc **En-tête** propose la liste des logos d'établissement, repris de
 ceux publiés sur unionpourlenfance.com. Un champ permet aussi de coller
 l'adresse d'un autre logo.
 
-Ces logos existent en vert UPE : ils ne se lisent pas sur l'en-tête vert, et
-s'affichent donc sur un bandeau blanc au-dessus. Dès qu'une version blanche est
-renseignée (champs `ub`, `lb`, `hb` d'une entrée de `LOGOS`), le logo passe dans
-l'en-tête vert, à la place de celui de l'Union, qu'il porte déjà.
+Les logos d'origine sont en vert UPE et ne se lisent pas sur l'en-tête vert.
+Une version blanche sur fond transparent a donc été produite pour chacun et
+déposée dans la médiathèque du site (`…/uploads/2026/10/<établissement>-blanc.png`) :
+le logo s'affiche dans l'en-tête vert, à la place de celui de l'Union, qu'il porte déjà.
+
+Un établissement dont la version blanche n'est pas renseignée (champs `ub`, `lb`,
+`hb` d'une entrée de `LOGOS`) retombe sur un bandeau blanc au-dessus de l'en-tête,
+avec son logo en couleur. C'est le cas d'Agapè Anjou, dont le seul fichier publié
+est la version co-signée École de production, sur fond blanc opaque.
 
 ### Les images
 
