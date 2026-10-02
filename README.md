@@ -39,10 +39,13 @@ le titre, et le numéro démarre avec son propre jeu de blocs — édito signé,
 article, album photo, rendez-vous, informations pratiques.
 
 Le bloc **En-tête** propose la liste des logos d'établissement, repris de
-ceux publiés sur unionpourlenfance.com. Le logo choisi s'affiche sur un bandeau
-blanc tout en haut de la lettre — ces logos sont en vert UPE et ne se lisent que
-sur fond clair — et remplace alors le logo de l'Union dans l'en-tête vert, qu'il
-porte déjà. Un champ permet aussi de coller l'adresse d'un autre logo.
+ceux publiés sur unionpourlenfance.com. Un champ permet aussi de coller
+l'adresse d'un autre logo.
+
+Ces logos existent en vert UPE : ils ne se lisent pas sur l'en-tête vert, et
+s'affichent donc sur un bandeau blanc au-dessus. Dès qu'une version blanche est
+renseignée (champs `ub`, `lb`, `hb` d'une entrée de `LOGOS`), le logo passe dans
+l'en-tête vert, à la place de celui de l'Union, qu'il porte déjà.
 
 ### Les images
 
@@ -52,6 +55,17 @@ puis sur l'image **Afficher les détails → Copier l'URL**.
 
 Attention : tout fichier déposé dans le studio Mailchimp est consultable par quiconque
 a le lien. Ne pas y déposer de photo d'enfant sans les autorisations requises.
+
+## La personnalisation
+
+Les 26 balises de l'audience Mailchimp de l'UPE sont dans l'atelier, groupées
+par thème (personne, contact, adresse, lien à l'Union, entreprise). On clique
+dans un champ, puis sur la balise : elle se pose au curseur. Elles fonctionnent
+dans n'importe quel champ, pas seulement la formule d'appel.
+
+L'aperçu les remplace par des valeurs d'exemple et résout les conditions
+`*|IF:FNAME|*Bonjour *|FNAME|*,*|ELSE:|*Bonjour,*|END:IF|*`, pour qu'on voie la
+phrase finie. Le catalogue est l'objet `BALISES` du code source.
 
 ## Le contenu rédigé
 
