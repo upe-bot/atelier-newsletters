@@ -81,6 +81,11 @@ Les textes se saisissent en clair. Trois conventions dans les champs longs :
 | une ligne vide | un nouveau paragraphe |
 | `- texte` en début de ligne | une puce |
 | `**texte**` | du gras |
+| `[intitulé](adresse)` | un lien |
+
+Les champs **Visuels** acceptent une adresse par ligne : un seul visuel prend toute
+la largeur, deux ou trois se rangent côte à côte, au-delà ils passent à la ligne.
+Article, Ressource et Bonus culturel en ont un.
 
 ## Sauvegarde et passage de relais
 
