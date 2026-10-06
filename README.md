@@ -102,9 +102,16 @@ Deux façons de recueillir les réponses, au choix dans le bloc :
 - **Liens que je fournis** — chaque réponse part vers l'adresse indiquée, une par
   ligne dans le même ordre : enquête Mailchimp, formulaire, page du site.
 
-La **réponse libre** prend soit une adresse e-mail — le lien devient un `mailto:`
-avec l'objet prérempli, le lecteur répond depuis sa messagerie — soit une adresse
-http vers la page de son choix.
+La **réponse libre** est préremplie avec l'enquête Mailchimp de l'Union,
+« Lettres d'information — votre réponse en quelques mots » : une page d'une seule
+question, aux couleurs de la charte, où arrivent les réponses libres de tous les
+numéros, toutes familles confondues. Les résultats se lisent dans *Audience →
+Enquêtes → Consulter les résultats*, avec export CSV ou PDF. L'enquête ne comporte
+pas de champ e-mail : les réponses sont donc anonymes, et l'introduction invite le
+lecteur à laisser son adresse dans le texte s'il souhaite être recontacté.
+
+Le champ accepte aussi une adresse e-mail à la place : le lien devient alors un
+`mailto:` avec l'objet prérempli, et la réponse arrive dans cette boîte.
 
 Trois limites tiennent à Mailchimp, pas à l'atelier : une seule question de ce type
 par numéro, le rapport ne rappelant pas l'intitulé de la question ; aucun vote
