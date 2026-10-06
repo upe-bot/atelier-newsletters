@@ -87,6 +87,30 @@ Les champs **Visuels** acceptent une adresse par ligne : un seul visuel prend to
 la largeur, deux ou trois se rangent côte à côte, au-delà ils passent à la ligne.
 Article, Ressource et Bonus culturel en ont un.
 
+## Le sondage
+
+Le bloc **Sondage** pose une question et jusqu'à cinq réponses à cocher, plus une
+réponse libre facultative. Le lecteur coche dans sa boîte mail : un clic, pas de
+page à ouvrir ni de formulaire à remplir.
+
+Deux façons de recueillir les réponses, au choix dans le bloc :
+
+- **Vote Mailchimp** (par défaut) — chaque réponse devient une balise
+  `*|SURVEY:intitulé|*`. Mailchimp la remplace par un lien de vote et compte les
+  réponses dans le rapport de la campagne. Le lien produit est habillé par la règle
+  `.sv a` de la feuille de style de l'e-mail.
+- **Liens que je fournis** — chaque réponse part vers l'adresse indiquée, une par
+  ligne dans le même ordre : enquête Mailchimp, formulaire, page du site.
+
+La **réponse libre** prend soit une adresse e-mail — le lien devient un `mailto:`
+avec l'objet prérempli, le lecteur répond depuis sa messagerie — soit une adresse
+http vers la page de son choix.
+
+Trois limites tiennent à Mailchimp, pas à l'atelier : une seule question de ce type
+par numéro, le rapport ne rappelant pas l'intitulé de la question ; aucun vote
+depuis la version « Afficher cet e-mail dans votre navigateur » ; et ces clics
+n'entrent pas dans le taux de clic de la campagne.
+
 ## Sauvegarde et passage de relais
 
 **Enregistrer** garde le numéro en cours dans le navigateur — propre à l'ordinateur
